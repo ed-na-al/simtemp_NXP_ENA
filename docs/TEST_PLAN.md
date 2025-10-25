@@ -1,45 +1,44 @@
-## **Plan de Pruebas de Alto Nivel (High-Level Test Plan)**
+## **High-Level Test Plan**
 
-Este plan valida los principales criterios de aceptación del desafío del ingeniero de software.
+This plan validates the main acceptance criteria for the software engineer challenge.
 
-### **T1 — Ciclo de Vida del Módulo (Load/Unload)**
+### **T1 — Module Life Cycle (Load/Unload)**
 
-| Objetivo | Descripción | Comandos | Criterios de Éxito |
+| Objective | Description | Commands | Success Criteria |
 | :---- | :---- | :---- | :---- |
-| **T1.1** Build | Compilar el módulo y la aplicación de usuario. | ./scripts/build.sh | Compilación exitosa (nxp\_simtemp.ko generado). |
-| **T1.2** Load | Insertar el módulo. | sudo insmod kernel/nxp\_simtemp.ko | No hay errores en dmesg. Los nodos /dev/simtemp0 y /sys/class/simtemp/simtemp0 existen. |
-| **T1.3** SysFS Defaults | Verificar la lectura de los valores iniciales. | cat /sys/.../sampling\_ms | Los valores coinciden con los predeterminados (e.g., 1000\) o los definidos en el DT (e.g., 500). |
-| **T1.4** Unload (Clean) | Remover el módulo. | sudo rmmod nxp\_simtemp | Módulo removido sin error "Device is busy". No hay advertencias/OOPS en dmesg. Los nodos se han ido. |
+| **T1.1** Build | Compile the module and the user application. | ./scripts/build.sh | Successful compilation (nxp\_simtemp.ko generated). |
+| **T1.2** Load | Insert the module. | sudo insmod kernel/nxp\_simtemp.ko | No errors in dmesg. The nodes /dev/simtemp0 and /sys/class/simtemp/simtemp0 exist. |
+| **T1.3** SysFS Defaults | Verify reading the initial values. | cat /sys/.../sampling\_ms | Values match the defaults (e.g., 1000) or those defined in the DT (e.g., 500). |
+| **T1.4** Unload (Clean) | Remove the module. | sudo rmmod nxp\_simtemp | Module removed without "Device is busy" error. No warnings/OOPS in dmesg. The nodes are gone. |
 
-### **T2 — Ruta de Datos (Data Path) y Frecuencia**
+### **T2 — Data Path and Frequency**
 
-| Objetivo | Descripción | Comandos | Criterios de Éxito |
+| Objective | Description | Commands | Success Criteria |
 | :---- | :---- | :---- | :---- |
-| **T2.1** Lectura Binaria | Verificar que la CLI pueda leer un registro binario completo. | ./user/cli/main.py | La CLI decodifica correctamente 8 \+ 4 \+ 4 \= 16 bytes. Los campos timestamp\_ns y temp\_mC son válidos. |
-| **T2.2** Frecuencia | Verificar que la frecuencia de muestreo se respeta. | ./user/cli/main.py \--sampling 200 | La salida muestra aproximadamente 5 lecturas por segundo. |
-| **T2.3** Bloqueo | Verificar el bloqueo de read() y poll() sin O\_NONBLOCK. | dd if=/dev/simtemp0 bs=16 count=1 | dd se bloquea hasta que hay un nuevo sample. |
+| **T2.1** Binary Read | Verify that the CLI can read a complete binary record. | ./user/cli/main.py | The CLI correctly decodes 8 \+ 4 \+ 4 \= 16 bytes. The timestamp\_ns and temp\_mC fields are valid. |
+| **T2.2** Frequency | Verify that the sampling frequency is respected. | ./user/cli/main.py \--sampling 200 | The output shows approximately 5 readings per second. |
+| **T2.3** Blocking | Verify blocking of read() and poll() without O\_NONBLOCK. | dd if=/dev/simtemp0 bs=16 count=1 | dd blocks until a new sample is available. |
 
-### **T3 — Umbral de Alerta y Eventos (POLLPRI)**
+### **T3 — Alert Threshold and Events (POLLPRI)**
 
-| Objetivo | Descripción | Comandos | Criterios de Éxito |
+| Objective | Description | Commands | Success Criteria |
 | :---- | :---- | :---- | :---- |
-| **T3.1** Evento de Umbral | Configurar un umbral bajo para forzar una alerta. | echo 30000 \> /sys/.../threshold\_mc | La CLI (usando poll()) detecta un evento **POLLPRI**. El registro binario leído tiene el SIMTEMP\_FLAG\_THRESHOLD\_CROSSED (bit 1\) activado. |
-| **T3.2** Modo Test | Ejecutar la prueba automática de la CLI. | ./scripts/run\_demo.sh | El script finaliza con un mensaje TEST: PASS y código de salida 0\. |
-| **T3.3** Alerta Desactivada | Subir el umbral por encima de la temperatura simulada. | echo 60000 \> /sys/.../threshold\_mc | No se disparan eventos POLLPRI. |
+| **T3.1** Threshold Event | Configure a low threshold to force an alert. | echo 30000 \> /sys/.../threshold\_mc | The CLI (using poll()) detects a **POLLPRI** event. The binary record read has the SIMTEMP\_FLAG\_THRESHOLD\_CROSSED (bit 1) set. |
+| **T3.2** Test Mode | Execute the automatic CLI test. | ./scripts/run\_demo.sh | The script finishes with a TEST: PASS message and exit code 0. |
+| **T3.3** Alert Deactivated | Raise the threshold above the simulated temperature. | echo 60000 \> /sys/.../threshold\_mc | No POLLPRI events are triggered. |
 
-### **T4 — Configuración SysFS**
+### **T4 — SysFS Configuration**
 
-| Objetivo | Descripción | Comandos | Criterios de Éxito |
+| Objective | Description | Commands | Success Criteria |
 | :---- | :---- | :---- | :---- |
-| **T4.1** SysFS Write | Modificar sampling\_ms a un nuevo valor. | echo 50 \> /sys/.../sampling\_ms | El cambio se aplica y la frecuencia de muestreo aumenta inmediatamente. |
-| **T4.2** Validación de Entrada | Intentar escribir un valor no válido. | echo "abc" \> /sys/.../sampling\_ms | La escritura falla y retorna \-EINVAL al usuario (el comando echo falla). El valor anterior se mantiene. |
-| **T4.3** Stats | Verificar el incremento de contadores. | 1\. cat stats. 2\. Esperar 5s. 3\. cat stats. | total\_updates se incrementa en \~5x. total\_alerts se incrementa si el umbral está cruzado. |
-| **T4.4** Mode | Cambiar el modo de simulación. | echo noisy \> /sys/.../mode | La temperatura simulada muestra más variación (ruido) en las lecturas de la CLI. |
+| **T4.1** SysFS Write | Modify sampling\_ms to a new value. | echo 50 \> /sys/.../sampling\_ms | The change is applied and the sampling frequency increases immediately. |
+| **T4.2** Input Validation | Attempt to write an invalid value. | echo "abc" \> /sys/.../sampling\_ms | The write fails and returns \-EINVAL to the user (the echo command fails). The previous value is maintained. |
+| **T4.3** Stats | Verify the increment of counters. | 1\. cat stats. 2\. Wait 5s. 3\. cat stats. | total\_updates increases by \~5x. total\_alerts increases if the threshold is crossed. |
+| **T4.4** Mode | Change the simulation mode. | echo noisy \> /sys/.../mode | The simulated temperature shows more variation (noise) in the CLI readings. |
 
-### **T5 — Robustez (Concurrency & Error Paths)**
+### **T5 — Robustness (Concurrency & Error Paths)**
 
-| Objetivo | Descripción | Criterios de Éxito |
-| :---- | :---- | :---- |
-| **T5.1** KFIFO Overflow | Intentar saturar el buffer (e.g., sampling\_ms=10). | cat stats |
-| **T5.2** Unload Under Load | Remover el módulo mientras la CLI está leyendo. | sudo rmmod mientras la CLI se ejecuta. |
-
+| Objective | Description | Commands | Success Criteria |
+| :---- | :---- | :---- | :---- |
+| **T5.1** KFIFO Overflow | Attempt to saturate the buffer (e.g., sampling\_ms=10). | cat stats | total\_overflows should increment. The system should remain stable. |
+| **T5.2** Unload Under Load | Remove the module while the CLI is reading. | sudo rmmod while the CLI is running. | rmmod must succeed. The kernel must not crash/WARN/BUG (no OOPS). |
