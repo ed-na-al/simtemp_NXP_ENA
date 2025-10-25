@@ -1,0 +1,1 @@
+savedcmd_/home/eduardo/Documentos/simtemp/kernel/nxp_simtemp.ko := ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T scripts/module.lds -o /home/eduardo/Documentos/simtemp/kernel/nxp_simtemp.ko /home/eduardo/Documentos/simtemp/kernel/nxp_simtemp.o /home/eduardo/Documentos/simtemp/kernel/nxp_simtemp.mod.o

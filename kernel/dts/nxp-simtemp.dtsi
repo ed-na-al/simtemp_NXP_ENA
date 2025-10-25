@@ -1,0 +1,8 @@
+/* kernel/dts/nxp-simtemp.dtsi  (ejemplo) */
+simtemp0: simtemp {
+    compatible = "nxp,simtemp";
+    sampling-ms = <5000>;        /* opcional: valor inicial */
+    threshold-mC = <45000>;     /* umbral en milli-C */
+    status = "okay";
+};
+

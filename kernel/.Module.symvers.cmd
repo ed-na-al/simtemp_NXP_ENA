@@ -1,0 +1,1 @@
+savedcmd_/home/eduardo/Documentos/simtemp/kernel/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/eduardo/Documentos/simtemp/kernel/Module.symvers -T /home/eduardo/Documentos/simtemp/kernel/modules.order -i Module.symvers -e 
