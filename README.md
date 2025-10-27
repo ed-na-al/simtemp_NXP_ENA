@@ -4,28 +4,29 @@ This project implements an out-of-tree platform driver simulated temperature sen
 
 ## **1\. Repository Structure**
 
+```bash
 simtemp/
-├─ kernel/
-│  ├─ Kbuild
-│  ├─ Makefile
-│  ├─ nxp\_simtemp.c
-│  ├─ nxp\_simtemp.h
-│  └─ dts/
-│     └─ nxp-simtemp.dtsi
-├─ user/
-│  ├─ cli/
-│  │  └─ main.py            # Python CLI (Consumer of /dev/simtemp0)
-├─ scripts/
-│  ├─ build.sh           # Compiles the .ko module
-│  └─ run\_demo.sh        # Insmod, SysFS Configuration, Run Test, Rmmod
-├─ docs/
-│  ├─ README.md (This file)
-│  ├─ DESIGN.md
-│  ├─ TESTPLAN.md
-│  ├─ CLI\_USAGE.md       # CLI Documentation
-|  └─ AI_NOTES.md
-|   
-└─ .gitignore
+├── kernel/
+│   ├── Kbuild
+│   ├── Makefile
+│   ├── nxp_simtemp.c
+│   ├── nxp_simtemp.h
+│   └── dts/
+│       └── nxp-simtemp.dtsi
+├── user/
+│   └── cli/
+│       └── main.py            
+├── scripts/
+│   ├── build.sh           
+│   └── run_demo.sh        
+└── docs/
+    ├── README.md (Este archivo)
+    ├── DESIGN.md
+    ├── TESTPLAN.md
+    ├── CLI_USAGE.md       
+    └── AI_NOTES.md
+
+```
 
 ## **2\. Prerequisites**
 
@@ -84,4 +85,4 @@ For more details on the CLI, consult docs/CLI\_USAGE.md.
 ## **6\. Submission Information (Commit Patch)**
 
 Video Demo Link: https://youtu.be/seG8FFlLHk8
-Git Repository Link: \[Link to my public GitHub/GitLab repository\]
+Git Repository Link: https://github.com/ed-na-al/simtemp_NXP_ENA
